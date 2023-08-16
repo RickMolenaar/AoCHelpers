@@ -17,21 +17,31 @@ def parse_example():
 def format_input(inp):
     return inp
 
-def solve(inp, debug=False):
+def solve(inp, part, debug=False):
+    if part == 2:
+        return None
+
     inp = format_input(inp)
     return None
 
 def main(debug = False):
-    return str(solve(parse_example(), True)) + '\\n' + str(solve(parse_input(), debug))
+    s = ''
+    for part in (1, 2):
+        s += f'Part {{part}} example: {{solve(parse_example(), part, True)}}\\n'
+        s += f'Part {{part}} actual : {{solve(parse_input(), part, debug)}}\\n'
+    return s.rstrip()
 """
 
 def generate(day: int, year: int) -> None:
     with open(f"{CWD}/day{day:0>2}.py", "w") as f:
         f.write(TEMPLATE_FILE.format(day = day))
         
-    if day <= datetime.datetime.today().day:
+    if day <= datetime.datetime.today().day or year <= datetime.datetime.today().year:
         input_page = get_page(f"/{year}/day/{day}/input")
-        if input_page.status_code != 200:
+        if input_page.status_code == 400:
+            print('Bad request for getting input. Is your session cookie up to date?')
+        elif input_page.status_code != 200:
+            print(f'Error requesting /{year}/day/{day}/inupt:')
             print(input_page.status_code, input_page.reason)
             open(f"{CWD}/day{day:0>2}.txt", "w").close()
         else:
@@ -40,6 +50,7 @@ def generate(day: int, year: int) -> None:
 
         problem_page = get_page(f"/{year}/day/{day}")
         if problem_page.status_code != 200:
+            print(f'Error requesting /{year}/day/{day}:')
             print(problem_page.status_code, problem_page.reason)
             open(f"{CWD}/day{day:0>2}.txt", "w").close()
             open(f"{CWD}/day{day:0>2}example.txt", "w").close()

@@ -47,7 +47,10 @@ class Watcher:
                             print(f"File {filename} was changed")
                         self.last_modified_times[i] = modified_time
                 if modified:
-                    self.run()
+                    try:
+                        self.run()
+                    except KeyboardInterrupt:
+                        print('Interrupting run')
                 time.sleep(self.interval)
 
         except KeyboardInterrupt:
@@ -59,7 +62,7 @@ class Watcher:
             if self.module is None:
                 self.module = import_module(self.filename[:-3])
             module = reload(self.module)
-        except (SyntaxError, IndentationError) as e:
+        except (SyntaxError, IndentationError, ModuleNotFoundError) as e:
             print('Could not load module')
             print(traceback.format_exc())
             return

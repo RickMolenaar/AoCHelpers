@@ -4,8 +4,7 @@ import importlib
 import os
 import time
 
-import generator
-import pywatch
+from AoCHelpers import generator, pywatch
 
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -27,7 +26,7 @@ def run(year = None):
     if not args.generate and not os.path.exists(f"day{day:0>2}.py"):
         raise ValueError(f"Generator parameter was not supplied and file doesn't exist: day{day:0>2}.py")
     if args.generate:
-        generator.generate(day)
+        generator.generate(day, year)
     elif args.time:
         module = importlib.import_module(f"day{day:0>2}")
         t0 = time.time()
