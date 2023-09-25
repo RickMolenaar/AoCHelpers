@@ -4,7 +4,7 @@ import importlib
 import os
 import time
 
-from . import generator, pywatch
+from . import generator, AoCWatcher
 
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -34,5 +34,5 @@ def run(year = None):
         print(f'Done in {time.time() - t0} s')
     else:
         day = f'{day:0>2}'
-        watcher = pywatch.Watcher(f'day{day}.py', 'main', f'day{day}example.txt', f'day{day}.txt')
+        watcher = AoCWatcher.Watcher(f'day{day}.py', 'main', f'day{day}example.txt', f'day{day}.txt')
         watcher.watch()
