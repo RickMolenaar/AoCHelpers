@@ -18,7 +18,7 @@ class Watcher(pywatch.Watcher):
                  interval: int = 1, 
                  verbose: bool = False, 
                  **additional_args: Any):
-        super().__init__(self, filename, function, *additional_files, interval, verbose, **additional_args)
+        super().__init__(filename, function, *additional_files, interval, verbose, **additional_args)
         self.answers = []
         self.verified_answers = []
         self.year = year
