@@ -34,5 +34,5 @@ def run(year = None):
         print(f'Done in {time.time() - t0} s')
     else:
         day = f'{day:0>2}'
-        watcher = AoCWatcher.Watcher(f'day{day}.py', 'main', f'day{day}example.txt', f'day{day}.txt')
+        watcher = AoCWatcher.Watcher(year, day)
         watcher.watch()

@@ -12,13 +12,13 @@ class Watcher(pywatch.Watcher):
     def __init__(self,
                  year: int,
                  day: int,
-                 filename: str, 
-                 function: Callable, 
-                 *additional_files: str, 
+                 *additional_files: str,
                  interval: int = 1, 
                  verbose: bool = False, 
                  **additional_args: Any):
-        super().__init__(filename, function, *additional_files, interval, verbose, **additional_args)
+        filename = f'day{day}.py'
+        additional_files = (f'day{day}example.txt', f'day{day}.txt')
+        super().__init__(filename, 'main', *additional_files, interval = interval, verbose = verbose, **additional_args)
         self.answers = []
         self.verified_answers = []
         self.year = year
@@ -43,6 +43,7 @@ class Watcher(pywatch.Watcher):
             elif inp == 'q':
                 return True
             else:
+                print('-' * 5)
                 return False
 
     def handle_output(self, result):
@@ -56,7 +57,7 @@ class Watcher(pywatch.Watcher):
                     print(f'Error during part {part} {"example" if example else "actual"}:')
                     print(traceback.format_exc())
                 else:
-                    print(f'Part {part} {"example" if example else "actual"}: {next(res)}')
+                    print(f'Part {part} {"example" if example else "actual "}: {res}')
                     if not example:
                         self.answers.append(res)
 
