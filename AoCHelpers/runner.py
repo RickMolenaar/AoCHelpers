@@ -4,7 +4,7 @@ import importlib
 import os
 import time
 
-from AoCHelpers import generator, pywatch
+from . import generator, pywatch
 
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser()

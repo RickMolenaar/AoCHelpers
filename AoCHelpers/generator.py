@@ -17,19 +17,19 @@ def parse_example():
 def format_input(inp):
     return inp
 
-def solve(inp, part, debug=False):
+def solve(inp, part, example):
     if part == 2:
         return None
 
     inp = format_input(inp)
     return None
 
-def main(debug = False):
-    s = ''
+def main():
+    answers = []
     for part in (1, 2):
-        s += f'Part {{part}} example: {{solve(parse_example(), part, True)}}\\n'
-        s += f'Part {{part}} actual : {{solve(parse_input(), part, debug)}}\\n'
-    return s.rstrip()
+    for example in (True, False):
+            inp = parse_example() if example else parse_input()
+            yield solve(inp, part, example)
 """
 
 def generate(day: int, year: int) -> None:

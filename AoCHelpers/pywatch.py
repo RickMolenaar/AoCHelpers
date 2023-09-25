@@ -3,6 +3,8 @@ from importlib import import_module, reload
 import os
 import time
 import traceback
+from typing import Any, Callable
+from types import GeneratorType
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
@@ -20,12 +22,18 @@ def parse_arguments():
 
 
 class Watcher:
-    def __init__(self, filename, function, *additional_files, interval = 1, verbose = False, **additional_args):
+    def __init__(self, 
+                 filename: str, 
+                 function: Callable, 
+                 *additional_files: str, 
+                 interval: int = 1, 
+                 verbose: bool = False, 
+                 **additional_args: Any):
         self.filename = filename
         self.to_watch = (filename,) + additional_files
         self.function = function
         self.last_modified_times = [0] * len(self.to_watch)
-        self.interval = 1
+        self.interval = interval
         self.verbose = verbose
         self.additional_args = additional_args
         self.previously_found = False
@@ -36,8 +44,8 @@ class Watcher:
 
     def watch(self):
         print(f"Watching function {self.function}, files: {self.to_watch}")
-        try:
-            while True:
+        while True:
+            try:
                 modified = False
                 for i, filename in enumerate(self.to_watch):
                     modified_time = os.stat(filename).st_mtime
@@ -50,12 +58,13 @@ class Watcher:
                     try:
                         self.run()
                     except KeyboardInterrupt:
-                        print('Interrupting run')
+                        self.handle_interrupt(True)
                 time.sleep(self.interval)
 
-        except KeyboardInterrupt:
-            print('Stopping watcher')
-            return
+            except KeyboardInterrupt:
+                if self.handle_interrupt(False):
+                    return
+            
 
     def run(self):
         try:
@@ -84,8 +93,19 @@ class Watcher:
         else:
             if self.verbose:
                 print('Watched method returned: ', end = '')
-            print(result)
+            self.handle_output(result)
         print('-' * 5)
+
+    def handle_interrupt(self, during_run: bool) -> bool:
+        if during_run:
+            print('Interrupting run')
+            return False
+        else:
+            print('Stopping watcher')
+            return True
+
+    def handle_output(self, output) -> None:
+        print(output)
 
 if __name__=='__main__':
     args = parse_arguments()
