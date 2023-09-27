@@ -1,4 +1,5 @@
 import datetime
+import os
 import requests
 
 from bs4 import BeautifulSoup, Tag
@@ -25,14 +26,20 @@ def solve(inp, part, example):
     return None
 
 def main():
-    answers = []
     for part in (1, 2):
-    for example in (True, False):
+        for example in (True, False):
             inp = parse_example() if example else parse_input()
             yield solve(inp, part, example)
 """
 
 def generate(day: int, year: int) -> None:
+    if os.path.exists(f"{CWD}/day{day:0>2}.py"):
+        print(f'{CWD}/day{day:0>2}.py already exists. Continue generating? (y/n)')
+        inp = input()
+        while inp.lower() not in 'yn':
+            inp = input('(y/n) ')
+        if inp.lower() == 'n':
+            return
     with open(f"{CWD}/day{day:0>2}.py", "w") as f:
         f.write(TEMPLATE_FILE.format(day = day))
         

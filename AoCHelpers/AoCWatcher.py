@@ -1,12 +1,12 @@
 import traceback
-from typing import Any, Callable
+from typing import Any
 from pathlib import Path
 
 from . import pywatch
 from .communicator import Communicator
 
 
-CWD = Path.cwd()
+CWD = str(Path.cwd())
 
 class Watcher(pywatch.Watcher):
     def __init__(self,
@@ -16,30 +16,44 @@ class Watcher(pywatch.Watcher):
                  interval: int = 1, 
                  verbose: bool = False, 
                  **additional_args: Any):
-        filename = f'day{day}.py'
-        additional_files = (f'day{day}example.txt', f'day{day}.txt')
+        filename = f'day{day:0>2}.py'
+        additional_files = (f'day{day:0>2}example.txt', f'day{day:0>2}.txt')
         super().__init__(filename, 'main', *additional_files, interval = interval, verbose = verbose, **additional_args)
         self.answers = []
-        self.verified_answers = []
         self.year = year
         self.day = day
         self.communicator = Communicator()
+        self.read_stats()
         
     def handle_interrupt(self, during_run: bool) -> None:
         if during_run:
             print('Interrupting run, press enter to rerun')
             input()
         else:
+            part = self.stats[self.day - 1] + 1
             print('What would you like to do?')
-            print(f'[S]ubmit answer for part {len(self.verified_answers) + 1}')
+            if part in (1, 2):
+                print(f'[S]ubmit answer for part {part}')
             print('[Q]uit watcher')
             print('[C]ontinue')
             inp = input()
-            while inp.lower() not in 'sqc':
-                inp = input('Unrecognized command\n')
+            valid = False
             inp = inp.lower()
+            while not valid:
+                inp = inp.lower()
+                if not inp or inp not in 'sqc':
+                    inp = input('Unrecognized command\n')
+                elif inp == 's' and part > 2:
+                    inp = input('All parts have been submitted\n')
+                else:
+                    valid = True
             if inp == 's':
-                self.communicator.submit_answer(self.year, self.day, self.answers[-1])
+                result = self.communicator.submit_answer(self.year, self.day, part, self.answers[-1])
+                if result:
+                    self.stats[self.day - 1] += 1
+                    self.write_stats()
+                print('-' * 5)
+                return False
             elif inp == 'q':
                 return True
             else:
@@ -58,8 +72,23 @@ class Watcher(pywatch.Watcher):
                     print(traceback.format_exc())
                 else:
                     print(f'Part {part} {"example" if example else "actual "}: {res}')
-                    if not example:
+                    if not example and res is not None:
                         self.answers.append(res)
+
+    def read_stats(self):
+        try:
+            stats_file = open(CWD + '/stats.txt')
+            self.stats = []
+            for line in stats_file:
+                self.stats.append(int(line))
+        except FileNotFoundError:
+            self.stats = [0] * 25
+            self.write_stats()
+
+    def write_stats(self):
+        f = open(CWD + '/stats.txt', 'w')
+        for i in range(25):
+            f.write(str(self.stats[i]) + '\n')
 
 if __name__=='__main__':
     pass

@@ -11,6 +11,7 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument('-d', '--day', help="Which day to run")
     parser.add_argument('-g', '--generate', action='store_true',  help="Whether todays files should be generated")
     parser.add_argument('-t', '--time', action='store_true')
+    parser.add_argument('-r', '--run', action='store_true')
     parser.add_argument('--debug', action='store_true')
     return parser.parse_args()
 
@@ -33,6 +34,8 @@ def run(year = None):
         print(module.main())
         print(f'Done in {time.time() - t0} s')
     else:
-        day = f'{day:0>2}'
+        watcher = AoCWatcher.Watcher(year, day)
+        watcher.watch()
+    if args.run:
         watcher = AoCWatcher.Watcher(year, day)
         watcher.watch()
