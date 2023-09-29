@@ -58,7 +58,8 @@ class Watcher:
                     try:
                         self.run()
                     except KeyboardInterrupt:
-                        self.handle_interrupt(True)
+                        if self.handle_interrupt(True):
+                            return
                 time.sleep(self.interval)
 
             except KeyboardInterrupt:

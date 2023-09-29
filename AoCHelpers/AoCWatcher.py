@@ -65,15 +65,16 @@ class Watcher(pywatch.Watcher):
             for example in (True, False):
                 try:
                     res = next(result)
-                except KeyboardInterrupt as e:
+                except KeyboardInterrupt:
                     self.handle_interrupt(True)
-                except Exception:
-                    print(f'Error during part {part} {"example" if example else "actual"}:')
-                    print(traceback.format_exc())
                 else:
-                    print(f'Part {part} {"example" if example else "actual "}: {res}')
-                    if not example and res is not None:
-                        self.answers.append(res)
+                    if isinstance(res, Exception):
+                        print(f'Error during part {part} {"example" if example else "actual"}:')
+                        traceback.print_exception(res)
+                    else:
+                        print(f'Part {part} {"example" if example else "actual "}: {res}')
+                        if not example and res is not None:
+                            self.answers.append(res)
 
     def read_stats(self):
         try:

@@ -29,7 +29,12 @@ def main():
     for part in (1, 2):
         for example in (True, False):
             inp = parse_example() if example else parse_input()
-            yield solve(inp, part, example)
+            try:
+                yield solve(inp, part, example)
+            except KeyboardInterrupt:
+                raise
+            except Exception as e:
+                yield e
 """
 
 def generate(day: int, year: int) -> None:
