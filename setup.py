@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="AoCHelpers",
-    version="0.2017a6",
+    version="0.2017a7",
     packages=find_packages(),
     install_requires= [
         "requests",

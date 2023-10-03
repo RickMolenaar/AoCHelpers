@@ -31,7 +31,8 @@ def run(year = None):
     elif args.time:
         module = importlib.import_module(f"day{day:0>2}")
         t0 = time.time()
-        print(module.main())
+        for res in module.main():
+            print(res)
         print(f'Done in {time.time() - t0} s')
     else:
         args.run = True

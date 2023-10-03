@@ -19,9 +19,6 @@ def format_input(inp):
     return inp
 
 def solve(inp, part, example):
-    if part == 2:
-        return None
-
     inp = format_input(inp)
     return None
 

@@ -62,6 +62,8 @@ class Watcher(pywatch.Watcher):
 
     def handle_output(self, result):
         for part in (1, 2):
+            if part == 2 and self.stats[self.day - 1] == 0:
+                continue
             for example in (True, False):
                 try:
                     res = next(result)
