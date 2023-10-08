@@ -69,6 +69,7 @@ class Watcher(pywatch.Watcher):
                     res = next(result)
                 except KeyboardInterrupt:
                     self.handle_interrupt(True)
+                    return
                 else:
                     if isinstance(res, Exception):
                         print(f'Error during part {part} {"example" if example else "actual"}:')

@@ -19,13 +19,14 @@ def format_input(inp):
     return inp
 
 def solve(inp, part, example):
-    inp = format_input(inp)
     return None
 
 def main():
+    example_input = format_input(parse_example())
+    actual_input = format_input(parse_input())
     for part in (1, 2):
         for example in (True, False):
-            inp = parse_example() if example else parse_input()
+            inp = example_input if example else actual_input
             try:
                 yield solve(inp, part, example)
             except KeyboardInterrupt:
@@ -110,6 +111,7 @@ def find_example_candidates(elements, strict = True):
         if i == len(elements) - 1:
             continue
         if elements[i+1].name == 'pre':
+            print(el.text.lower())
             if to_find in el.text.lower():
                 candidates.append((el, elements[i+1]))
     return candidates
