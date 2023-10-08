@@ -19,6 +19,3 @@ def generate_primes(max):
             primes.append(p)
         p += 2
     return primes
-
-if __name__=='__main__':
-    print(sum(primes(2_000_000)))

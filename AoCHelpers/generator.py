@@ -15,7 +15,7 @@ TEMPLATE_FILE = """def parse_input(file = 'day{day:0>2}.txt'):
 def parse_example():
     return parse_input('day{day:0>2}example.txt')
 
-def format_input(inp):
+def format_input(inp: list[str]):
     return inp
 
 def solve(inp, part, example):
