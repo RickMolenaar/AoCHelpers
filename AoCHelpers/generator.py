@@ -1,11 +1,12 @@
 import datetime
 import os
-import requests
+from time import sleep
 
 from bs4 import BeautifulSoup, Tag
-from pathlib import Path
 
-CWD = Path.cwd()
+from .communicator import Communicator
+from .tools import day_of_month, EST_now, EST
+
 
 TEMPLATE_FILE = """def parse_input(file = 'day{day:0>2}.txt'):
     with open(file) as f:
@@ -35,63 +36,70 @@ def main():
                 yield e
 """
 
-def generate(day: int, year: int) -> None:
-    if os.path.exists(f"{CWD}/day{day:0>2}.py"):
-        print(f'{CWD}/day{day:0>2}.py already exists. Continue generating? (y/n)')
+def generate(day: int, year: int, countdown: bool) -> None:
+    communicator = Communicator()
+    if os.path.exists(f"day{day:0>2}.py"):
+        print(f'day{day:0>2}.py already exists. Continue generating? (y/n)')
         inp = input()
         while inp.lower() not in 'yn':
             inp = input('(y/n) ')
         if inp.lower() == 'n':
             return
-    with open(f"{CWD}/day{day:0>2}.py", "w") as f:
+        
+    with open(f"day{day:0>2}.py", "w") as f:
         f.write(TEMPLATE_FILE.format(day = day))
         
-    if day <= datetime.datetime.today().day or year <= datetime.datetime.today().year:
-        input_page = get_page(f"/{year}/day/{day}/input")
-        if input_page.status_code == 400:
-            print('Bad request for getting input. Is your session cookie up to date?')
-        elif input_page.status_code != 200:
-            print(f'Error requesting /{year}/day/{day}/inupt:')
-            print(input_page.status_code, input_page.reason)
-            open(f"{CWD}/day{day:0>2}.txt", "w").close()
-        else:
-            with open(f"{CWD}/day{day:0>2}.txt", "w") as f:
-                f.write(input_page.text)
+    if day > day_of_month() and year >= datetime.date.today().year and not countdown:
+        open(f"day{day:0>2}.txt", "w").close()
+        open(f"day{day:0>2}example.txt", "w").close()
+        return
+    elif countdown:
+        target = datetime.datetime(year, 12, day, second=2, tzinfo=EST())   # Avoid time sync issues
+        to_wait = (target - EST_now()).seconds
+        print(f'Counting down {to_wait} seconds')
+        try:
+            if to_wait > 60:
+                sleep(to_wait - 60)
+                print('One minute left')
+                to_wait = (target - EST_now()).seconds  #Ensure accuracy
+            if to_wait > 10:
+                sleep(to_wait - 10)
+                print('10 seconds left')
+                to_wait = (target - EST_now()).seconds
+            if to_wait > 1:
+                sleep(to_wait - 1)
+            while EST_now() < target:
+                sleep(0.1)
+        except KeyboardInterrupt:
+            print('Countdown interrupted, writing empty files')
+            open(f"day{day:0>2}.txt", "w").close()
+            open(f"day{day:0>2}example.txt", "w").close()
+            return
 
-        problem_page = get_page(f"/{year}/day/{day}")
-        if problem_page.status_code != 200:
-            print(f'Error requesting /{year}/day/{day}:')
-            print(problem_page.status_code, problem_page.reason)
-            open(f"{CWD}/day{day:0>2}.txt", "w").close()
-            open(f"{CWD}/day{day:0>2}example.txt", "w").close()
-        else:
-            problem_page = BeautifulSoup(problem_page.content, features='html.parser')
-            part1 = problem_page.find(name='article')
-            example_candidates = find_example(part1)
-            if len(example_candidates) == 1:
-                example = example_candidates[0][1]
-                print('Writing example to file:')
-                print(example.text)
-                with open(f"{CWD}/day{day:0>2}example.txt", "w") as f:
-                    f.write(example.text)
-            else:
-                for candidate in example_candidates:
-                    print('Potential example:')
-                    print(candidate[0].text)
-                    print(candidate[1].text)
-                    print('=' * 30)
-                open(f"{CWD}/day{day:0>2}example.txt", "w").close()
+    with open(f"day{day:0>2}.txt", "w") as f:
+        f.write(communicator.get_input(year, day))
+
+    problem_page = communicator.get_problem(year, day)
+    problem_page = BeautifulSoup(problem_page, features='html.parser')
+    part1 = problem_page.find(name='article')
+    if part1 is None:
+        print("Could not parse page")
+        open(f"day{day:0>2}example.txt", "w").close()
+        return
+    example_candidates = find_example(part1)
+    if len(example_candidates) == 1:
+        example = example_candidates[0][1]
+        print('Writing example to file:')
+        print(example.text)
+        with open(f"day{day:0>2}example.txt", "w") as f:
+            f.write(example.text)
     else:
-        open(f"{CWD}/day{day:0>2}.txt", "w").close()
-        open(f"{CWD}/day{day:0>2}example.txt", "w").close()
-
-
-def get_page(location: str) -> requests.Response:
-    with open('session.cookie') as f:
-        cookie = f.readline()
-    if not location.startswith('/'):
-        location = '/' + location
-    return requests.get(f'https://adventofcode.com' + location, cookies={'session': cookie})
+        for candidate in example_candidates:
+            print('Potential example:')
+            print(candidate[0].text)
+            print(candidate[1].text)
+            print('=' * 30)
+        open(f"day{day:0>2}example.txt", "w").close()
 
 def find_example(article: Tag) -> list[tuple[str, str]]:
     children = [c for c in list(article.children) if c != '\n']
@@ -111,7 +119,6 @@ def find_example_candidates(elements, strict = True):
         if i == len(elements) - 1:
             continue
         if elements[i+1].name == 'pre':
-            print(el.text.lower())
             if to_find in el.text.lower():
                 candidates.append((el, elements[i+1]))
     return candidates

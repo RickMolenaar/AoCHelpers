@@ -1,10 +1,12 @@
 import argparse
 import datetime
+from datetime import datetime
 import importlib
 import os
 import time
 
 from . import generator, AoCWatcher
+from .tools import day_of_month
 
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -13,6 +15,7 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument('-t', '--time', action='store_true')
     parser.add_argument('-r', '--run', action='store_true')
     parser.add_argument('--debug', action='store_true')
+    parser.add_argument('--countdown', '--cd', action='store_true')
     return parser.parse_args()
 
 def run(year = None):
@@ -20,14 +23,14 @@ def run(year = None):
     if year is None:
         year = datetime.datetime.today().year
     if args.day is None:
-        day = datetime.datetime.today().day
+        day = day_of_month()
     else:
         day = int(args.day)
     
     if not args.generate and not os.path.exists(f"day{day:0>2}.py"):
         raise ValueError(f"Generator parameter was not supplied and file doesn't exist: day{day:0>2}.py")
     if args.generate:
-        generator.generate(day, year)
+        generator.generate(day, year, args.countdown)
     elif args.time:
         module = importlib.import_module(f"day{day:0>2}")
         t0 = time.time()

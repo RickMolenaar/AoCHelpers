@@ -16,9 +16,22 @@ class Communicator(object, metaclass=Singleton):
             print("session.cookie not populated, can't communicate with AoC website")
 
     def get_input(self, year, day):
-        pass
+        if not self.cookie:
+            print("Can't get input without cookie")
+            return ''
+        url = f'https://adventofcode.com/{year}/day/{day}/input'
+        resp = self.request(url)
+        return resp.text
+
+    def get_problem(self, year, day):
+        url = f'https://adventofcode.com/{year}/day/{day}'
+        resp = self.request(url)
+        return resp.content
 
     def submit_answer(self, year, day, part, answer) -> requests.Response:
+        if not self.cookie:
+            print("Can't submit answer without cookie")
+            return
         url = f'https://adventofcode.com/{year}/day/{day}/answer'
         data = {'level': str(part), 'answer': str(answer)}
         resp = self.request(url, 'POST', data)
@@ -56,7 +69,10 @@ class Communicator(object, metaclass=Singleton):
             self.recent_calls = self.recent_calls[1:]
         cookies = {'session': self.cookie}
         resp = requests.request(method, url, data=data, cookies=cookies)
-        if resp.status_code not in (200, 201):
+        
+        if resp.status_code == 400:
+            print(f'400 error calling {url}. Is your cookie up to date?')
+        elif resp.status_code not in (200, 201):
             print(f'Unexpected status code calling {url}: {resp.status_code}')
         return resp
 
