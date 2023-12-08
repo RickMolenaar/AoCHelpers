@@ -4,7 +4,6 @@ import os
 import time
 import traceback
 from typing import Any, Callable
-from types import GeneratorType
 
 def parse_arguments():
     parser = argparse.ArgumentParser()

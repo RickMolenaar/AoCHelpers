@@ -5,8 +5,8 @@ import importlib
 import os
 import time
 
-from . import generator, AoCWatcher
-from .tools import day_of_month
+from AoCHelpers import generator, AoCWatcher
+from AoCHelpers.tools import day_of_month
 
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser()

@@ -3,7 +3,7 @@ import os
 from typing import *
 import requests
 
-from .tools import Singleton
+from AoCHelpers.tools import Singleton
 
 class Communicator(object, metaclass=Singleton):
     def __init__(self):

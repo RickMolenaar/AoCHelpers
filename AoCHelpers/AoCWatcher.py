@@ -2,8 +2,8 @@ import traceback
 from typing import Any
 from pathlib import Path
 
-from . import pywatch
-from .communicator import Communicator
+from AoCHelpers import pywatch
+from AoCHelpers.communicator import Communicator
 
 
 CWD = str(Path.cwd())

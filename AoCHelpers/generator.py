@@ -4,8 +4,8 @@ from time import sleep
 
 from bs4 import BeautifulSoup, Tag
 
-from .communicator import Communicator
-from .tools import day_of_month, EST_now, EST
+from AoCHelpers.communicator import Communicator
+from AoCHelpers.tools import day_of_month, EST_now, EST
 
 
 TEMPLATE_FILE = """def parse_input(file = 'day{day:0>2}.txt'):
