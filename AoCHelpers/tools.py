@@ -1,5 +1,3 @@
-from datetime import datetime, timedelta, tzinfo
-
 class Singleton(type):
     _instances = {}
     def __call__(cls, *args, **kwargs):
@@ -21,22 +19,3 @@ def generate_primes(max):
             primes.append(p)
         p += 2
     return primes
-
-class EST(tzinfo):
-    def utcoffset(self, __dt: datetime | None) -> timedelta:
-        return timedelta(hours=-5)
-    
-    def dst(self, dt):
-        return timedelta(0)
-    
-    def tzname(self,dt):
-        return "EST"
-
-    def  __repr__(self):
-        return f"{self.__class__.__name__}()"
-
-def day_of_month() -> int:
-    return datetime.now(tz = EST()).day
-
-def EST_now() -> datetime:
-    return datetime.now(tz = EST())

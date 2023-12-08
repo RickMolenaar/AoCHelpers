@@ -5,7 +5,7 @@ from time import sleep
 from bs4 import BeautifulSoup, Tag
 
 from AoCHelpers.communicator import Communicator
-from AoCHelpers.tools import day_of_month, EST_now, EST
+from AoCHelpers.functions import day_of_month, EST_now, EST
 
 
 TEMPLATE_FILE = """def parse_input(file = 'day{day:0>2}.txt'):
@@ -54,7 +54,7 @@ def generate(day: int, year: int, countdown: bool) -> None:
         open(f"day{day:0>2}example.txt", "w").close()
         return
     elif countdown:
-        target = datetime.datetime(year, 12, day, second=2, tzinfo=EST())   # Avoid time sync issues
+        target = datetime.datetime(year, 12, day, second=2, tzinfo=EST())   # Add 2 seconds to avoid time sync issues
         to_wait = (target - EST_now()).seconds
         print(f'Counting down {to_wait} seconds')
         try:
