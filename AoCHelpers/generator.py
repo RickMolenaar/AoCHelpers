@@ -8,7 +8,9 @@ from AoCHelpers.communicator import Communicator
 from AoCHelpers.functions import day_of_month, EST_now, EST
 
 
-TEMPLATE_FILE = """def parse_input(file = 'day{day:0>2}.txt'):
+TEMPLATE_FILE = """from copy import deepcopy
+
+def parse_input(file = 'day{day:0>2}.txt'):
     with open(file) as f:
         s = map(lambda l: l.rstrip(), f.readlines())
     return list(s)
@@ -27,7 +29,7 @@ def main():
     actual_input = format_input(parse_input())
     for part in (1, 2):
         for example in (True, False):
-            inp = example_input if example else actual_input
+            inp = deepcopy(example_input if example else actual_input)
             try:
                 yield solve(inp, part, example)
             except KeyboardInterrupt:

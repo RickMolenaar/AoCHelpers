@@ -70,6 +70,10 @@ class Watcher(pywatch.Watcher):
                 except KeyboardInterrupt:
                     self.handle_interrupt(True)
                     return
+                except Exception as e:
+                    print('Exception during input handling:')
+                    traceback.print_exception(e)
+                    return
                 else:
                     if isinstance(res, Exception):
                         print(f'Error during part {part} {"example" if example else "actual"}:')
