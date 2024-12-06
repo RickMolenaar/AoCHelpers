@@ -38,7 +38,7 @@ class Watcher:
         self.previously_found = False
         try:
             self.module = import_module(filename[:-3])
-        except (SyntaxError, IndentationError, NameError):
+        except (SyntaxError, IndentationError, NameError, ImportError):
             self.module = None    # Will be caught in run()
 
     def watch(self):

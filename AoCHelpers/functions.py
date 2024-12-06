@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, tzinfo
+from typing import Literal
 
 class EST(tzinfo):
     def utcoffset(self, __dt: datetime | None) -> timedelta:
@@ -28,3 +29,20 @@ def gcd(a, b):
         b = a % b
         a = t
     return a
+
+def rotate(to_rotate: tuple[int, int], about: tuple[int, int], direction: Literal['cw', 'ccw'], ypos: Literal['up', 'down'] = 'up'):
+    if direction not in ('cw', 'ccw'):
+        raise ValueError('direction must be either \'cw\' or \'ccw\'')
+    if ypos not in ('up', 'down'):
+        raise ValueError('ypos must be either up or down')
+    x, y = to_rotate
+    ox, oy = about
+    dx, dy = x - ox, y - oy
+    match direction, ypos:
+        case ('cw', 'up') | ('ccw', 'down'):
+            dx, dy = dy, -dx
+        case ('ccw', 'up') | ('cw', 'down'):
+            dx, dy = -dy, dx
+        case _:
+            raise ValueError
+    return ox + dx, oy + dy

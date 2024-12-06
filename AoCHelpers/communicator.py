@@ -50,6 +50,10 @@ class Communicator(object, metaclass=Singleton):
             else:
                 print(f'Day {day} is solved. Continue optimizing or quit the watcher')
             return True
+        elif 'To play, please identify yourself' in content:
+            print('Session cookie expired, please refresh your cookie manually')
+        elif 'gave an answer too recently' in content:
+            print('You gave an answer too recently')
         else:
             print('Could not parse response:')
             print(content)
