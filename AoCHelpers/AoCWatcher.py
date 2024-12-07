@@ -4,6 +4,7 @@ from pathlib import Path
 
 from AoCHelpers import pywatch
 from AoCHelpers.communicator import Communicator
+from AoCHelpers.leaderboard import print_daily_leaderboard
 
 
 CWD = str(Path.cwd())
@@ -25,7 +26,7 @@ class Watcher(pywatch.Watcher):
         self.communicator = Communicator()
         self.read_stats()
         
-    def handle_interrupt(self, during_run: bool) -> None:
+    def handle_interrupt(self, during_run: bool) -> bool:
         if during_run:
             print('Interrupting run, press enter to rerun')
             input()
@@ -34,6 +35,7 @@ class Watcher(pywatch.Watcher):
             print('What would you like to do?')
             if part in (1, 2):
                 print(f'[S]ubmit answer for part {part}')
+            print('Print [L]eaderboard')
             print('[Q]uit watcher')
             print('[C]ontinue')
             inp = input()
@@ -41,24 +43,28 @@ class Watcher(pywatch.Watcher):
             inp = inp.lower()
             while not valid:
                 inp = inp.lower()
-                if not inp or inp not in 'sqc':
+                if not inp or inp not in 'sqcl':
                     inp = input('Unrecognized command\n')
                 elif inp == 's' and part > 2:
                     inp = input('All parts have been submitted\n')
                 else:
                     valid = True
-            if inp == 's':
-                result = self.communicator.submit_answer(self.year, self.day, part, self.answers[-1])
-                if result:
-                    self.stats[self.day - 1] += 1
-                    self.write_stats()
-                print('-' * 5)
-                return False
-            elif inp == 'q':
-                return True
-            else:
-                print('-' * 5)
-                return False
+            match inp:
+                case 's':
+                    result = self.communicator.submit_answer(self.year, self.day, part, self.answers[-1])
+                    if result:
+                        self.stats[self.day - 1] += 1
+                        self.write_stats()
+                    print('-' * 5)
+                    return False
+                case 'q':
+                    return True
+                case 'l':
+                    print_daily_leaderboard(self.year, self.day)
+                    return False
+                case 'c':
+                    print('-' * 5)
+                    return False
 
     def handle_output(self, result):
         for part in (1, 2):

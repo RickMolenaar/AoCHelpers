@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 from AoCHelpers.communicator import Communicator
 from AoCHelpers.functions import EST
 
+DUMMY = False
+
 def get_leaderboard(year: int, leaderboard_id: str = None) -> dict:
     if DUMMY:
         return json.load(open('dummy_leaderboard.txt'))
@@ -44,7 +46,7 @@ def get_daily_leaderboard(year: int, day: int, leaderboard_id: str = None):
         times[data['name']] = member_times
     return times
 
-def print_daily_leaderboard(year, day, leaderboard_id = None):
+def print_daily_leaderboard(year: None, day: None, leaderboard_id: str = None) -> None:
     times = get_daily_leaderboard(year, day, leaderboard_id)
     max_points = len(times)
     scores = {member: {} for member in times if 1 in times[member]}
@@ -56,6 +58,7 @@ def print_daily_leaderboard(year, day, leaderboard_id = None):
     format = '{:<20}| {:>11} | {:>6} | {:>11} | {:>6} | {:>12} |'
     print('{:<20}| {:<11} | {:<6} | {:<11} | {:<6} | {:>12} |'\
           .format('Name', 'Part 1 time', 'Points', 'Part 2 time', 'Points', 'Total points'))
+    print('-' * 82)
 
     data = []
     for member in scores:
@@ -70,8 +73,9 @@ def print_daily_leaderboard(year, day, leaderboard_id = None):
         data.append(args)
     for line in sorted(data, key = lambda row: row[-1], reverse=True):
         print(format.format(*line))
+    print('-' * 82)
 
-def find_leaderboard_id(year: int):
+def find_leaderboard_id(year: int) -> str:
     page = Communicator().request(f'https://adventofcode.com/{year}/leaderboard/private')
     page = str(page.content)
     leaderboards = []
