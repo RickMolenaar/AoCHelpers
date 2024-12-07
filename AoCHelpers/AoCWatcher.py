@@ -29,7 +29,11 @@ class Watcher(pywatch.Watcher):
     def handle_interrupt(self, during_run: bool) -> bool:
         if during_run:
             print('Interrupting run, press enter to rerun')
-            input()
+            try:
+                input()
+            except EOFError:
+                self.handle_interrupt(False)
+            return False
         else:
             part = self.stats[self.day - 1] + 1
             print('What would you like to do?')
